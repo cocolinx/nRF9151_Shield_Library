@@ -354,7 +354,7 @@ int32_t CocoLinx::ddnsResolve(const char* hostname, uint8_t* hostIp)
     memcpy(pktdata, hostname, nameLen);
     pktdata[nameLen] = '\0';
 
-    int32_t ack = transferPkt(CATEGORY_LTE, CMD_LTE_DDNS, nameLen + 1, 10000);
+    int32_t ack = transferPkt(CATEGORY_LTE, CMD_LTE_DDNS_IPV4, nameLen + 1, 10000);
     if(ack != 0) return ack;
 
     if(hostIp != nullptr) {

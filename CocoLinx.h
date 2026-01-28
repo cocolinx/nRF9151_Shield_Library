@@ -93,87 +93,436 @@ public:
     } GnssData;
 
     CocoLinx();
+
+    /**
+     * @brief Initialize the UART interface and resets the LTE shield.
+     * @param type Serial interface type used to communicate with the shield.
+     * @return True if success, false otherwise.
+     */
     bool begin(SerialType type);
     void loop();
 
-    // sys
+    /************************************************************************
+     *                           System Functions
+     ************************************************************************/
+
+    /**
+     * @brief Check shield communication status.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t sysCheck();
+
+    /**
+     * @brief Reset shield.
+     * @return True if success, false otherwise.
+     */
     bool sysReset();
+
+    /**
+     * @brief Get shield version.
+     * @param ver4 Pointer to a 4-byte buffer for the version.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t sysGetVersion(uint8_t *ver4);
+
+    /**
+     * @brief Set shield LED status.
+     * @param onoff True if turn on, false turn off.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */ 
     int32_t sysSetLed(bool onoff);
+
+    /**
+     * @brief Get shield button count.
+     * @param pCount Pointer to a buffer for the button count.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */ 
     int32_t sysGetBtnCount(uint32_t *pCount);
+
+    /**
+     * @brief Factory reset for shield.
+     * @return True if success, false otherwise.
+     */   
     bool sysFactoryReset();
+
+    /**
+     * @brief Get system uptime. 
+     * @param pRtc Pointer to a buffer for current uptime in milliseconds.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */    
     int32_t sysGetRtc(int64_t *pRtc);
 
-    // rs-485
-    int32_t rs485Enable(uint32_t baudrate);
-    int32_t rs485Disable();
-    int32_t rs485Send(const uint8_t *data, uint32_t size);
-    int32_t rs485Send(const char *data, uint32_t size);
-    int32_t rs485Recv(uint8_t *buffer, uint32_t bufferSize);
-    int32_t rs485Recv(char *buffer, uint32_t bufferSize);
-    int32_t rs485ClearBuffer();
+    /************************************************************************
+     *                           RS-485 Functions
+     ************************************************************************/
 
-    // gnss
+    /**
+     * @brief Enable the RS-485 transceiver on the LTE shield.
+     * @param baudrate Baudrate to set on RS-485 transceiver.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */    
+    int32_t rs485Enable(uint32_t baudrate);
+
+    /**
+     * @brief Disable the RS-485 transceiver on the LTE shield.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */    
+    int32_t rs485Disable();
+
+    /**
+     * @brief Sends data over the RS-485 interface.
+     * @param data Pointer to a buffer for data to be sent.
+     * @param size Number of bytes to send.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
+    int32_t rs485Send(const uint8_t *data, uint32_t size);
+
+    /**
+     * @brief Send character data over the RS-485 interface.
+     * @param data Pointer to a buffer for data to be sent.
+     * @param size Number of bytes to send.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
+    int32_t rs485Send(const char *data, uint32_t size);
+
+    /**
+     * @brief Receive data over the RS-485 interface.
+     * @param data Pointer to a buffer for receive data.
+     * @param size Number of bytes that reveice.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
+    int32_t rs485Recv(uint8_t *buffer, uint32_t bufferSize);
+
+    /**
+     * @brief Receive character data over the RS-485 interface.
+     * @param data Pointer to a buffer for receive data.
+     * @param size Number of bytes that reveice.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
+    int32_t rs485Recv(char *buffer, uint32_t bufferSize);
+
+    /**
+     * @brief Clear RS-485 RX ring buffer in shield.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
+    int32_t rs485ClearBuffer();
+ 
+    /************************************************************************
+     *                           GNSS Functions
+     ************************************************************************/
+
+    /**
+     * @brief Start GNSS operation.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t gnssStart();
+
+    /**
+     * @brief Stop GNSS operation.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t gnssStop();
+
+    /**
+     * @brief Check if GNSS operation is running or not.
+     * @return 1 if running, 0 if not running, otherwise error code (see AckCode enum).
+     */
     int32_t gnssIsRunning();
+
+    /**
+     * @brief Read GNSS data.
+     * @param pGnssData Pointer to a buffer for GNSS data.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t gnssRead(GnssData *pGnssData);
 
-    // lte
-    int32_t lteConnect(uint32_t timeout_ms, int32_t plmn);
-    int32_t lteDisconnect();
-    int32_t lteIsConnected();
-    int32_t lteReadInfo(LteInfo *pInfo);    
+    /************************
+     * LTE Functions
+     ************************/
 
-    // ddns
+    /**
+     * @brief Connect LTE with PLMN selection.
+     * @param timeout_ms Connection timeout in milliseconds (recommended 3 minutes).
+     * @param plmn PLMN code. Set to 0 for automatic network selection.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
+    int32_t lteConnect(uint32_t timeout_ms, int32_t plmn);
+
+    /**
+     * @brief Disconnect LTE.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
+    int32_t lteDisconnect();
+
+    /**
+     * @brief Check if LTE is connected or not.
+     * @return 1 if connected, 0 if not connected, otherwise error code (see AckCode enum).
+     */
+    int32_t lteIsConnected();
+
+    /**
+     * @brief Read LTE information data.
+     * @param pInfo Pointer to a buffer for LTE information data.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
+    int32_t lteReadInfo(LteInfo *pInfo);
+
+    /**
+     * @brief Get IP address from domain.
+     * @param hostname Domain name to resolve IP address
+     * @param hostIp Pointer to a 4-byte buffer for IP address.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t ddnsResolve(const char* hostname, uint8_t* hostIp);
 
-    // ping
+    /**
+     * @brief Send ICMP ping requests 4 times to the specified IPv4 address.
+     * @param dstIp Destination IPv4 address.
+     * @param sent Pointer to a buffer for number of ping packets sent.
+     * @param recv Pointer to a buffer for number of ping packets received.
+     * @param rttAvg Pointer to a buffer for average RTT in ms.
+     * @param rttMin Pointer to a buffer for min RTT in ms.
+     * @param rttMax Pointer to a buffer for max RTT in ms.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t ping(const uint8_t* dstIp, uint32_t *sent, uint32_t *recv, uint32_t *rttAvg, uint32_t *rttMin, uint32_t *rttMax);
     
-    // datetime unix
+    /**
+     * @brief Get the current date time UTC.
+     * @param unixMillis Pointer to a buffer for UTC.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t datetimeUnixMillis(int64_t *unixMillis);
 
-    // modem direct at command
+    /**
+     * @brief Send a formatted AT command to the shield's modem and receive the response.
+     * @param cmd AT command string to send.
+     * @param respBuf Pointer to a buffer for response reveived from shield's modem.
+     * @param respBufSize Number of respBuf buffer size.
+     * @param pRetCode Pointer to a buffer for result code reveived from shield's modem.
+     * @param timeoutMs Response timeout in ms.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t modemAtCmd(char *cmd, char *respBuf, uint32_t respBufSize, int32_t *pRetCode, uint32_t timeoutMs);
 
-    // udp
+    /************************************************************************
+     *                           UDP Functions
+     ************************************************************************/
+
+    /**
+     * @brief Open a UDP socket and connect to the specified remote endpoint.
+     * @param dstIp Destination IPv4 address.
+     * @param dstPort Destination UDP port number.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t udpOpen(const uint8_t* dstIp, uint16_t dstPort);
+
+    /**
+     * @brief Close a UDP socket.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t udpClose();
+
+    /**
+     * @brief Check if UDP socket is open or not.
+     * @return 1 if opened, 0 if not opened, otherwise error code (see AckCode enum).
+     */
     int32_t udpIsOpen();
+
+    /**
+     * @brief Send data to a connected peer.
+     * @param data Pointer to a buffer for data to be sent.
+     * @param size Number of data buffer size.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t udpSend(const uint8_t* data, uint32_t size);
+
+    /**
+     * @brief Send character data to a connected peer.
+     * @param data Pointer to a buffer for data to be sent.
+     * @param size Number of data buffer size.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t udpSend(const char* data, uint32_t size);
-    int32_t udpRecv(uint8_t* buffer, uint32_t bufferSize); // packet
+
+    /**
+     * @brief Receive data from the connected peer.
+     * @param buffer Pointer to a buffer for receive data.
+     * @param bufferSize Number of bytes that reveice.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
+    int32_t udpRecv(uint8_t* buffer, uint32_t bufferSize);
+
+    /**
+     * @brief Receive character data from the connected peer.
+     * @param buffer Pointer to a buffer for receive data.
+     * @param bufferSize Number of bytes that reveice.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
     int32_t udpRecv(char* buffer, uint32_t bufferSize);
+
+    /**
+     * @brief Clear UDP RX ring buffer in shield.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
     int32_t udpClearBuffer();
 
-    // tcp
+    /************************************************************************
+     *                           TCP Functions
+     ************************************************************************/
+
+    /**
+     * @brief Open a TCP socket and connect to the specified remote endpoint.
+     * @param dstIp Destination IPv4 address.
+     * @param dstPort Destination TCP port number.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t tcpConnect(const uint8_t* dstIp, uint16_t dstPort);
+
+    /**
+     * @brief Close a TCP socket and disconnect.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t tcpDisconnect();
+
+    /**
+     * @brief Check if TCP socket is connected or not.
+     * @return 1 if connected, 0 if not connected, otherwise error code (see AckCode enum).
+     */
     int32_t tcpIsConnected();
+
+    /**
+     * @brief Send data to a connected peer.
+     * @param data Pointer to a buffer for data to be sent.
+     * @param size Number of data buffer size.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t tcpSend(const uint8_t* data, uint32_t size);
+
+    /**
+     * @brief Send character data to a connected peer.
+     * @param data Pointer to a buffer for data to be sent.
+     * @param size Number of data buffer size.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */
     int32_t tcpSend(const char *data, uint32_t size);
-    int32_t tcpRecv(uint8_t* buffer, uint32_t bufferSize); // stream
+
+    /**
+     * @brief Receive data from the connected peer.
+     * @param buffer Pointer to a buffer for receive data.
+     * @param bufferSize Number of bytes that reveice.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
+    int32_t tcpRecv(uint8_t* buffer, uint32_t bufferSize);
+
+    /**
+     * @brief Receive character data from the connected peer.
+     * @param buffer Pointer to a buffer for receive data.
+     * @param bufferSize Number of bytes that reveice.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
     int32_t tcpRecv(char *buffer, uint32_t bufferSize);
+
+    /**
+     * @brief Clear TCP RX ring buffer in shield.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */  
     int32_t tcpClearBuffer();
 
-    // mqtt
-    // void mqttSetPrivateKey(const uint8_t *key, uint32_t keySize);    
+    /************************************************************************
+     *                           MQTT Functions
+     ************************************************************************/
+
+    /**
+     * @brief Connect to MQTT.
+     * @param dstIp Destination IPv4 address.
+     * @param dstPort Destination MQTT port number.
+     * @param keepAliveSecs Keep-alive interval in seconds
+     * @param cleanSeesion Clean session flag
+     * @param clientid MQTT client ID
+     * @param username MQTT username
+     * @param password MQTT password
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */   
     int32_t mqttConnect(const uint8_t* dstIp, uint16_t dstPort, 
         uint16_t keepAliveSecs, bool cleanSeesion, 
         const char *clientid, const char *username, const char *password);
         
+    /**
+     * @brief Disconnect to MQTT.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */  
     int32_t mqttDisconnect();
+
+    /**
+     * @brief Check if MQTT is connected or not.
+     * @return 1 if connected, 0 if not connected, otherwise error code (see AckCode enum).
+     */  
     int32_t mqttIsConnected();
+
+    /**
+     * @brief Publish a message to an MQTT topic.
+     * @param topic MQTT topic to publish to
+     * @param payload Message payload data
+     * @param payloadSize Number of payload buffer size.
+     * @param qosLevel MQTT QoS level (0, 1, or 2)
+     * @param retain Retain flag
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */  
     int32_t mqttPublish(const char *topic, const uint8_t *payload, uint32_t payloadSize, uint8_t qosLevel, bool retain);
+
+    /**
+     * @brief Publish a message to an MQTT topic.
+     * @param topic MQTT topic to publish to
+     * @param payload Message payload character data
+     * @param payloadSize Number of payload buffer size.
+     * @param qosLevel MQTT QoS level (0, 1, or 2)
+     * @param retain Retain flag
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */  
     int32_t mqttPublish(const char *topic, const char *payload, uint32_t payloadSize, uint8_t qosLevel, bool retain);
+
+    /**
+     * @brief Subscribe a MQTT topic.
+     * @param topic MQTT topic to subscribe to
+     * @param qosLevel MQTT QoS level (0, 1, or 2)
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */  
     int32_t mqttSubscribe(const char *topic, uint8_t qosLevel);
+
+    /**
+     * @brief Unsubscribe a MQTT topic.
+     * @param topic MQTT topic to unsubscribe to
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */  
     int32_t mqttUnSubscribe(const char *topic);
     
-    // return payload size
-    int32_t mqttRecvMsg(char *topicBuffer, uint32_t topicBufferSize, uint8_t *payloadBuffer, uint32_t payloadBufferSize, int32_t *pRecvPayloadSize); //
-    int32_t mqttRecvMsg(char *topicBuffer, uint32_t topicBufferSize, char *payloadBuffer, uint32_t payloadBufferSize, int32_t *pRecvPayloadSize); //
+    /**
+     * @brief Receives an MQTT message from subscribed topic and copies the subscribed topic and payload (if available).
+     * @param topicBuffer Pointer to a buffer for store the received topic name.
+     * @param topicBufferSize Number of topicBuffer size in bytes.
+     * @param payloadBuffer Pointer to a buffer for store the received payload.
+     * @param payloadBufferSize Number of payloadBuffer size in bytes.
+     * @param pRecvPayloadSize Actual size of the reveiced payload.
+     * @return topic size, otherwise negative error code.
+     */  
+    int32_t mqttRecvMsg(char *topicBuffer, uint32_t topicBufferSize, uint8_t *payloadBuffer, uint32_t payloadBufferSize, int32_t *pRecvPayloadSize);
+
+    /**
+     * @brief Receives an MQTT message from subscribed topic and copies the subscribed topic and payload (if available).
+     * @param topicBuffer Pointer to a buffer for store the received topic name.
+     * @param topicBufferSize Number of topicBuffer size in bytes.
+     * @param payloadBuffer Pointer to a character buffer for store the received payload.
+     * @param payloadBufferSize Number of payloadBuffer size in bytes.
+     * @param pRecvPayloadSize Actual size of the reveiced payload.
+     * @return topic size, otherwise negative error code.
+     */  
+    int32_t mqttRecvMsg(char *topicBuffer, uint32_t topicBufferSize, char *payloadBuffer, uint32_t payloadBufferSize, int32_t *pRecvPayloadSize);
+
+    /**
+     * @brief Clear MQTT RX ring buffer in shield.
+     * @return 0 on success, otherwise error code (see AckCode enum).
+     */  
     int32_t mqttClearBuffer();
 
 private:
@@ -245,7 +594,7 @@ private:
         CMD_LTE_READ_INFO, // req>null, ack>'x_lte_info_ack_t'
         CMD_LTE_READ_IMEI, // req>null, ack>imei[16]
         CMD_LTE_READ_ICCID, // req>null, ack>string[20]
-        CMD_LTE_DDNS, // req>hostname[128], ack>'x_ipaddr_t'
+        CMD_LTE_DDNS_IPV4, // req>hostname[128], ack>'x_ipaddr_t'
         CMD_LTE_PING_IPV4, // req>'x_lte_ping_req_t', ack>'x_lte_ping_ack_t'    
         CMD_LTE_DATETIME_UTC, // unix ms
         CMD_LTE_MODEM_ATCMD, // direct at command to modem(shell)
