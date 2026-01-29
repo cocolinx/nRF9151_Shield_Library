@@ -5,6 +5,7 @@
 
 CocoLinx coco;
 CocoLinx::LteInfo lteInfo;
+CocoLinx::GnssData gnssData;
 
 // keep lte connection
 bool sample_keep_connection()
@@ -456,6 +457,59 @@ bool sample_mqtt()
 	}
 }
 
+bool sample_gnss()
+{
+	int32_t ret;	
+	Serial.println("*** sample_gnss() ***");	
+
+	// gnss connect
+	Serial.print("gnss connect...");
+	ret = coco.gnssStart();
+	if(ret != 0) {
+		Serial.print("error: ");
+		Serial.println(ret);
+		coco.gnssStop();
+		return false;
+	} else {
+		Serial.println("okay");
+	}
+	int rxcnt = 60; // 1000ms * 60 = 60secs
+
+	// gnss read
+	while(rxcnt--) {
+		Serial.print("gnss read...");
+		ret = coco.gnssRead(&gnssData);
+		if(ret != 0) {
+			Serial.print("error: ");
+			Serial.println(ret); // error code: -28 means not fixed.
+		} else {
+			Serial.println("okay");
+			Serial.print("elapsed_ms: ");
+			Serial.println(gnssData.elapsed_ms);
+			Serial.print("satellites_visible: ");
+			Serial.println(gnssData.satellites_visible);
+			Serial.print("satellites_used: ");
+			Serial.println(gnssData.satellites_used);
+			Serial.print("latitude: ");
+			Serial.println(gnssData.latitude);
+			Serial.print("longitude: ");
+			Serial.println(gnssData.longitude);		
+			break;
+		}
+		if(rxcnt > 0) delay(1000);
+	}
+
+	Serial.print("gnss stop...");
+	ret = coco.gnssStop();
+	if(ret != 0) {
+		Serial.print("error: ");
+		Serial.println(ret);
+		return false;
+	} else {
+		Serial.println("okay");
+	}
+}
+
 void setup()
 {
 	int32_t ret;
@@ -588,6 +642,7 @@ void loop()
 			sample_tcp();
 			sample_mqtt();
 			sample_rs485();
+			sample_gnss();
 		}
 
 		// # cocolinx user-led
