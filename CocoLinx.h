@@ -541,7 +541,7 @@ private:
     const uint8_t SW_RX_PIN = 8;
     const uint8_t SW_TX_PIN = 7;
 
-    const uint32_t BAUDRATE = 9600;
+    const uint32_t BAUDRATE = 115200;
     
     typedef enum
     {
